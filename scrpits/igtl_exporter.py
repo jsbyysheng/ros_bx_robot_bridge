@@ -4,8 +4,8 @@ from std_msgs.msg import String
 import math
 import tf
 import geometry_msgs.msg
-from ROS_IGTL_Bridge.msg import igtlstring
-from ROS_IGTL_Bridge.msg import igtltransform
+from ros_igtl_bridge.msg import igtlstring
+from ros_igtl_bridge.msg import igtltransform
 from geometry_msgs.msg import Transform
 
 
