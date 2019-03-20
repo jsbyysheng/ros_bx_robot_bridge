@@ -29,39 +29,48 @@ def push_transform(pub, name, trans, rot):
 
 def igtl_exporter():
 
+    base_link_name = 'base_link'
+
+    link_name = [
+        'shoulder_link',
+        'upper_arm_link',
+        'forearm_link', 
+        'wrist_1_link', 
+        'wrist_2_link', 
+        'wrist_3_link', 
+        'wrist_3_link', 
+        'wrist_3_link',
+        'tool0',
+        'needle_holder',
+        'needle'
+    ]
+
     rospy.init_node('igtl_exporter', anonymous=True)
 
     pub_igtl_transform_out = rospy.Publisher('IGTL_TRANSFORM_OUT', igtltransform, queue_size=10)    
 
     listener = tf.TransformListener()
-    
-    #pub = rospy.Publisher('igtl_exporter', String, queue_size=10)
-    
     rate = rospy.Rate(10) # 10hz
-    hello_str = "hello world %s" % rospy.get_time()
 
+    n_link = len(link_name)
+
+    trans = [[0]*3]*n_link
+    rot = [[0]*4]*n_link
+    
     while not rospy.is_shutdown():
         
         try:
-            (trans1,rot1) = listener.lookupTransform('base_link', 'shoulder_link', rospy.Time())
-            (trans2,rot2) = listener.lookupTransform('base_link', 'upper_arm_link', rospy.Time())
-            (trans3,rot3) = listener.lookupTransform('base_link', 'forearm_link', rospy.Time())
-            (trans4,rot4) = listener.lookupTransform('base_link', 'wrist_1_link', rospy.Time())
-            (trans5,rot5) = listener.lookupTransform('base_link', 'wrist_2_link', rospy.Time())
-            (trans6,rot6) = listener.lookupTransform('base_link', 'wrist_3_link', rospy.Time())
+            for i in range(n_link):
+                (trans[i],rot[i]) = listener.lookupTransform(base_link_name, link_name[i], rospy.Time())
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue
 
-        push_transform(pub_igtl_transform_out, 'shoulder_link', trans1, rot1)
-        push_transform(pub_igtl_transform_out, 'upper_arm_link', trans2, rot2)
-        push_transform(pub_igtl_transform_out, 'forearm_link', trans3, rot3)
-        push_transform(pub_igtl_transform_out, 'wrist_1_link', trans4, rot4)
-        push_transform(pub_igtl_transform_out, 'wrist_2_link', trans5, rot5)
-        push_transform(pub_igtl_transform_out, 'wrist_3_link', trans6, rot6)
+        for i in range(n_link):
+            push_transform(pub_igtl_transform_out, link_name[i], trans[i], rot[i])
 
-        #hello_str = "hello world %s" % rospy.get_time()
-        #rospy.loginfo(hello_str)
-        #pub.publish(hello_str)
+        #log_str = "igtl_exporter %s" % rospy.get_time()
+        #rospy.loginfo(log_str)
+        #pub.publish(log_str)
         rate.sleep()
         
 
